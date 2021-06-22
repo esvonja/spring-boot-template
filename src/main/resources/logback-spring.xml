@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <springProperty name="sumologicToken" source="ap.sumologic.token"/>
+    <springProperty name="appName" source="spring.application.name"/>
+    <springProperty name="environment" source="ap.env"/>
+
+    <!-- Override defaults so it can't change without warning on a new release of spring boot -->
+    <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+        </layout>
+    </appender>
+
+    <springProfile name="pdev, sdev, ptest, stest, vtest, prod">
+        <appender name="SumoAppender" class="com.sumologic.logback.SumoLogicAppender">
+            <encoder>
+                <Pattern>${FILE_LOG_PATTERN}</Pattern>
+            </encoder>
+            <url>https://collectors.au.sumologic.com/receiver/v1/http/${sumologicToken}</url>
+            <sourceName>AppEvt_${appName}</sourceName>
+            <sourceCategory>IDT/ITServices/Tomcat/${appName}/${environment}/AppEvt_${appName}</sourceCategory>
+            <!--Uncomment for local testing -->
+            <!--<proxyHost>localhost</proxyHost>-->
+            <!--<proxyPort>3128</proxyPort>-->
+        </appender>
+    </springProfile>
+
+    <springProfile name="default, dev">
+        <root level="info">
+            <appender-ref ref="STDOUT" />
+        </root>
+        <logger name="au.com.developer.api" level="DEBUG" additivity="false">
+            <appender-ref ref="STDOUT" />
+        </logger>
+        <logger name="ap.http" level="DEBUG" additivity="false">
+            <appender-ref ref="STDOUT" />
+        </logger>
+    </springProfile>
+
+    <springProfile name="pdev, sdev">
+        <root level="info">
+            <appender-ref ref="STDOUT" />
+            <appender-ref ref="SumoAppender" />
+        </root>
+    </springProfile>
+
+    <springProfile name="ptest, stest, vtest">
+        <root level="info">
+            <appender-ref ref="STDOUT" />
+            <appender-ref ref="SumoAppender" />
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <root level="info">
+            <appender-ref ref="STDOUT" />
+            <appender-ref ref="SumoAppender" />
+        </root>
+    </springProfile>
+</configuration>

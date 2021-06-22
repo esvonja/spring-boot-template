@@ -1,0 +1,168 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.0.0-1
+      author: nampallyr
+      comment: event tracker table script
+      changes:
+        - createTable:
+            tableName: event_tracker
+            columns:
+              - column:
+                  name: event_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: consignment_number
+                  type: java.sql.Types.VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: process_date
+                  type: java.sql.Types.TIMESTAMP
+                  defaultValue: ${now}
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status_code
+                  type: java.sql.Types.VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status_reason_code
+                  type: java.sql.Types.VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: depot_code
+                  type: java.sql.Types.VARCHAR(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city_name
+                  type: java.sql.Types.VARCHAR(50)
+              - column:
+                  name: state_code
+                  type: java.sql.Types.VARCHAR(3)
+  - changeSet:
+      id: 1.0.0-2
+      author: howed
+      comment: Create indexes on event_tracker table
+      changes:
+        - createIndex:
+            tableName: event_tracker
+            indexName: event_tracker_i01
+            columns:
+              - column:
+                  name: consignment_number
+              - column:
+                  name: status_code
+              - column:
+                  name: status_reason_code
+              - column:
+                  name: depot_code
+              - column:
+                  name: city_name
+              - column:
+                  name: state_code
+        - createIndex:
+            tableName: event_tracker
+            indexName: event_tracker_i02
+            columns:
+              - column:
+                  name: process_date
+
+  - changeSet:
+      id: 1.0.0-3
+      author: svonjae
+      comment: consignment table script
+      changes:
+        - createTable:
+            tableName: consignment_request
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: consignment_number
+                  type: java.sql.Types.VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ste_event_data
+                  type: java.sql.Types.LONGVARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: create_date
+                  type: java.sql.Types.TIMESTAMP
+                  defaultValue: ${now}
+                  constraints:
+                    nullable: false
+              - column:
+                  name: process_date
+                  type: java.sql.Types.TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: status
+                  type: java.sql.Types.VARCHAR(20)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 1.0.0-4
+      author: svonjae
+      comment: Create indexes on consignment_request table
+      changes:
+        - createIndex:
+            tableName: consignment_request
+            indexName: consignment_request_i01
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            tableName: consignment_request
+            indexName: consignment_request_i02
+            columns:
+              - column:
+                  name: process_date
+        - createIndex:
+            tableName: consignment_request
+            indexName: consignment_request_i03
+            columns:
+              - column:
+                  name: consignment_number
+  - changeSet:
+      id: 1.0.0-5
+      author: svonjae
+      comment: Create scheduler lock table
+      changes:
+        - createTable:
+            tableName: shedlock
+            columns:
+              - column:
+                  name: name
+                  type: java.sql.Types.VARCHAR(64)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: lock_until
+                  type: java.sql.Types.TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: locked_at
+                  type: java.sql.Types.TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: locked_by
+                  type: java.sql.Types.VARCHAR(255)
+                  constraints:
+                    nullable: false
+  - include:
+      - file: db/changelog/db.changelog-1.0-data.yaml

@@ -1,0 +1,58 @@
+server:
+    port: 8080
+    tomcat:
+        access-log-enabled: true
+        access-log-pattern: "%h %l %u %t \"%r\" %s %b %D"
+spring:
+    application:
+        name: "@application.name@"
+    jackson:
+        serialization:
+            write_dates_as_timestamps: false
+            write_dates_with_zone_id: true
+        default-property-inclusion: NON_NULL
+    # BEGIN Properties to throw custom exceptions for HTTP 404, refer to SwaggerResourcesConfiguration.java for details
+    mvc:
+        throw-exception-if-no-handler-found: true
+    resources:
+        add-mappings: false
+    # END
+changeme:
+    welcome:
+        text: Welcome to ChangeMe
+    security:
+        realm-name: DeveloperApp
+        username: username
+        password: password
+    scheduledTaskThatRunsOnOneServer:
+        cron: "0 0/5 * * * ?" # Every 5 minutes
+app:
+    version-number: "@application.version.number@"
+    build-time: "@timestamp@"
+---
+spring:
+    config:
+        activate:
+            on-profile: dev
+ap:
+    env: dev
+changeme:
+    api-template:
+        url: http://localhost:8080/api/v1/service
+---
+spring:
+    config:
+        activate:
+            on-profile: integration
+ap:
+    env: dev
+---
+spring:
+    config:
+        activate:
+            on-profile: pdev
+ap:
+    env: pdev
+changeme:
+    welcome:
+        text: Welcome to ChangeMe on PDEV

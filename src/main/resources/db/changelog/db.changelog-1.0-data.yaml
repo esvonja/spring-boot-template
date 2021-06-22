@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.0.0-1-event_tracker-data
+      author: nampallyr
+      comment: event_tracker data insert
+      context: dev
+      changes:
+        loadData:
+          tableName: event_tracker
+          file: db/changelog/csv/event_tracker.csv
+  - changeSet:
+      id: 1.0.0-2-consignment_request-data
+      author: svaonje
+      comment: consignment_request data insert
+      context: dev
+      changes:
+        loadData:
+          tableName: consignment_request
+          file: db/changelog/csv/consignment_request.csv
